@@ -1,36 +1,20 @@
 import { useState } from 'react';
 import { Sidebar } from '@/components/Sidebar';
 import { Header } from '@/components/Header';
-import { WelcomeCard } from '@/components/WelcomeCard';
-import { StatsCards } from '@/components/StatsCards';
-import { FocusTimer } from '@/components/FocusTimer';
-import { WeeklyCalendar } from '@/components/WeeklyCalendar';
-import { TasksList } from '@/components/TasksList';
-import { ExamsList } from '@/components/ExamsList';
+import { Dashboard } from '@/components/Dashboard';
 import { AddNewDialog } from '@/components/AddNewDialog';
 import { AddTaskDialog } from '@/components/AddTaskDialog';
 import { AddExamDialog } from '@/components/AddExamDialog';
 import { useStudyPlan } from '@/hooks/useStudyPlan';
 import { Helmet } from 'react-helmet-async';
 
-const Index = () => {
+export function StudyPlanApp() {
   const [activeTab, setActiveTab] = useState('dashboard');
   const [addNewOpen, setAddNewOpen] = useState(false);
   const [addTaskOpen, setAddTaskOpen] = useState(false);
   const [addExamOpen, setAddExamOpen] = useState(false);
 
-  const { 
-    tasks, 
-    stats, 
-    prioritizedTasks, 
-    upcomingExams, 
-    addTask,
-    addExam,
-    completeTask, 
-    deleteTask, 
-    deleteExam,
-    addFocusTime 
-  } = useStudyPlan();
+  const { addTask, addExam } = useStudyPlan();
 
   return (
     <>
@@ -49,28 +33,7 @@ const Index = () => {
         <main className="flex-1 ml-64">
           <Header />
           <div className="p-6">
-            <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
-              {/* Main Content - Left 2 columns */}
-              <div className="xl:col-span-2 space-y-6">
-                <WelcomeCard stats={stats} userName="John" />
-                <StatsCards stats={stats} />
-                
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                  <TasksList 
-                    tasks={prioritizedTasks} 
-                    onComplete={completeTask} 
-                    onDelete={deleteTask} 
-                  />
-                  <ExamsList exams={upcomingExams} onDelete={deleteExam} />
-                </div>
-              </div>
-
-              {/* Right Column - Calendar and Timer */}
-              <div className="space-y-6">
-                <FocusTimer onSessionComplete={addFocusTime} />
-                <WeeklyCalendar tasks={tasks} />
-              </div>
-            </div>
+            <Dashboard />
           </div>
         </main>
 
@@ -95,6 +58,4 @@ const Index = () => {
       </div>
     </>
   );
-};
-
-export default Index;
+}
