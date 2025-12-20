@@ -7,6 +7,7 @@ import { FocusTimer } from '@/components/FocusTimer';
 import { WeeklyCalendar } from '@/components/WeeklyCalendar';
 import { TasksList } from '@/components/TasksList';
 import { ExamsList } from '@/components/ExamsList';
+import { AIRecommendations } from '@/components/AIRecommendations';
 import { AddNewDialog } from '@/components/AddNewDialog';
 import { AddTaskDialog } from '@/components/AddTaskDialog';
 import { AddExamDialog } from '@/components/AddExamDialog';
@@ -63,6 +64,9 @@ const Index = () => {
                   />
                   <ExamsList exams={upcomingExams} onDelete={deleteExam} />
                 </div>
+
+                {/* AI Recommendations - Full Width */}
+                <AIRecommendations tasks={tasks} exams={upcomingExams} />
               </div>
 
               {/* Right Column - Calendar and Timer */}

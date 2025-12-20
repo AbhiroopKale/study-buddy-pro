@@ -1,0 +1,4 @@
+project_id = "nzcprofdiiosabfydupo"
+
+[functions.study-recommendations]
+verify_jwt = false
