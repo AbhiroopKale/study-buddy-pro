@@ -1,6 +1,6 @@
 import { useState, useCallback, useMemo } from 'react';
-import { StudyTask, Exam, UserStats, Difficulty, TaskStatus, Priority } from '@/types/study';
-import { isAfter, isBefore, startOfDay, addDays, differenceInDays } from 'date-fns';
+import { StudyTask, Exam, UserStats, Difficulty, TaskStatus, Priority, FocusSession } from '@/types/study';
+import { isAfter, isBefore, startOfDay, addDays, subDays, subHours } from 'date-fns';
 
 const generateId = () => Math.random().toString(36).substring(2, 9);
 
@@ -61,9 +61,39 @@ const initialExams: Exam[] = [
   },
 ];
 
+// Generate sample historical focus sessions for the past week
+const generateInitialSessions = (): FocusSession[] => {
+  const sessions: FocusSession[] = [];
+  const now = new Date();
+  
+  // Add sample sessions for the past 7 days
+  for (let daysAgo = 6; daysAgo >= 0; daysAgo--) {
+    const sessionsPerDay = Math.floor(Math.random() * 3) + 1;
+    for (let s = 0; s < sessionsPerDay; s++) {
+      const startHour = 9 + Math.floor(Math.random() * 10);
+      const startTime = new Date(subDays(now, daysAgo));
+      startTime.setHours(startHour, Math.floor(Math.random() * 60), 0, 0);
+      
+      const duration = [15, 25, 25, 25, 30, 45][Math.floor(Math.random() * 6)];
+      const endTime = new Date(startTime.getTime() + duration * 60000);
+      
+      sessions.push({
+        id: generateId(),
+        startTime,
+        endTime,
+        durationMinutes: duration,
+        completed: Math.random() > 0.15,
+      });
+    }
+  }
+  
+  return sessions;
+};
+
 export function useStudyPlan() {
   const [tasks, setTasks] = useState<StudyTask[]>(initialTasks);
   const [exams, setExams] = useState<Exam[]>(initialExams);
+  const [focusSessions, setFocusSessions] = useState<FocusSession[]>(generateInitialSessions);
   const [focusMinutes, setFocusMinutes] = useState(0);
 
   const stats: UserStats = useMemo(() => {
@@ -129,7 +159,19 @@ export function useStudyPlan() {
     setExams(prev => prev.filter(e => e.id !== id));
   }, []);
 
-  const addFocusTime = useCallback((minutes: number) => {
+  const addFocusSession = useCallback((minutes: number, completed: boolean = true) => {
+    const endTime = new Date();
+    const startTime = new Date(endTime.getTime() - minutes * 60000);
+    
+    const newSession: FocusSession = {
+      id: generateId(),
+      startTime,
+      endTime,
+      durationMinutes: minutes,
+      completed,
+    };
+    
+    setFocusSessions(prev => [...prev, newSession]);
     setFocusMinutes(prev => prev + minutes);
   }, []);
 
@@ -167,6 +209,7 @@ export function useStudyPlan() {
     tasks,
     exams,
     stats,
+    focusSessions,
     prioritizedTasks,
     upcomingExams,
     addTask,
@@ -175,6 +218,6 @@ export function useStudyPlan() {
     deleteTask,
     addExam,
     deleteExam,
-    addFocusTime,
+    addFocusSession,
   };
 }

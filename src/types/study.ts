@@ -25,13 +25,12 @@ export interface Exam {
   difficulty: Difficulty;
 }
 
-export interface StudySession {
+export interface FocusSession {
   id: string;
-  taskId?: string;
   startTime: Date;
-  endTime?: Date;
-  focusMinutes: number;
-  breakMinutes: number;
+  endTime: Date;
+  durationMinutes: number;
+  completed: boolean;
 }
 
 export interface UserStats {
