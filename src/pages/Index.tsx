@@ -5,6 +5,7 @@ import { WelcomeCard } from '@/components/WelcomeCard';
 import { StatsCards } from '@/components/StatsCards';
 import { FocusTimer } from '@/components/FocusTimer';
 import { WeeklyCalendar } from '@/components/WeeklyCalendar';
+import { MonthlyCalendar } from '@/components/MonthlyCalendar';
 import { TasksList } from '@/components/TasksList';
 import { ExamsList } from '@/components/ExamsList';
 import { AIRecommendations } from '@/components/AIRecommendations';
@@ -23,11 +24,13 @@ const Index = () => {
 
   const { 
     tasks, 
+    exams,
     stats, 
     prioritizedTasks, 
     upcomingExams, 
     addTask,
     addExam,
+    updateTask,
     completeTask, 
     deleteTask, 
     deleteExam,
@@ -51,34 +54,42 @@ const Index = () => {
         <main className="flex-1 ml-64">
           <Header />
           <div className="p-6">
-            <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
-              {/* Main Content - Left 2 columns */}
-              <div className="xl:col-span-2 space-y-6">
-                <WelcomeCard stats={stats} userName="John" />
-                <StatsCards stats={stats} />
-                
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                  <TasksList 
-                    tasks={prioritizedTasks} 
-                    onComplete={completeTask} 
-                    onDelete={deleteTask} 
-                  />
-                  <ExamsList exams={upcomingExams} onDelete={deleteExam} />
+            {activeTab === 'calendar' ? (
+              <MonthlyCalendar 
+                tasks={tasks} 
+                exams={exams} 
+                onUpdateTask={updateTask} 
+              />
+            ) : (
+              <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+                {/* Main Content - Left 2 columns */}
+                <div className="xl:col-span-2 space-y-6">
+                  <WelcomeCard stats={stats} userName="John" />
+                  <StatsCards stats={stats} />
+                  
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <TasksList 
+                      tasks={prioritizedTasks} 
+                      onComplete={completeTask} 
+                      onDelete={deleteTask} 
+                    />
+                    <ExamsList exams={upcomingExams} onDelete={deleteExam} />
+                  </div>
+
+                  {/* AI Recommendations - Full Width */}
+                  <AIRecommendations tasks={tasks} exams={upcomingExams} />
+
+                  {/* Study Analytics - Full Width */}
+                  <StudyAnalytics tasks={tasks} stats={stats} />
                 </div>
 
-                {/* AI Recommendations - Full Width */}
-                <AIRecommendations tasks={tasks} exams={upcomingExams} />
-
-                {/* Study Analytics - Full Width */}
-                <StudyAnalytics tasks={tasks} stats={stats} />
+                {/* Right Column - Calendar and Timer */}
+                <div className="space-y-6">
+                  <FocusTimer onSessionComplete={addFocusTime} />
+                  <WeeklyCalendar tasks={tasks} />
+                </div>
               </div>
-
-              {/* Right Column - Calendar and Timer */}
-              <div className="space-y-6">
-                <FocusTimer onSessionComplete={addFocusTime} />
-                <WeeklyCalendar tasks={tasks} />
-              </div>
-            </div>
+            )}
           </div>
         </main>
 
