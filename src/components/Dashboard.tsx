@@ -15,7 +15,7 @@ export function Dashboard() {
     completeTask, 
     deleteTask, 
     deleteExam,
-    addFocusTime 
+    addFocusSession 
   } = useStudyPlan();
 
   return (
@@ -37,7 +37,7 @@ export function Dashboard() {
 
       {/* Right Column - Calendar and Timer */}
       <div className="space-y-6">
-        <FocusTimer onSessionComplete={addFocusTime} />
+        <FocusTimer onSessionComplete={addFocusSession} />
         <WeeklyCalendar tasks={tasks} />
       </div>
     </div>

@@ -1,14 +1,17 @@
 import { useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
-import { AreaChart, Area, BarChart, Bar, LineChart, Line, XAxis, YAxis, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
-import { TrendingUp, Clock, CheckCircle2, Target, Calendar, Flame } from 'lucide-react';
-import { StudyTask, UserStats } from '@/types/study';
-import { format, subDays, startOfDay, isAfter, isBefore, eachDayOfInterval } from 'date-fns';
+import { AreaChart, Area, BarChart, Bar, XAxis, YAxis, PieChart, Pie, Cell } from 'recharts';
+import { TrendingUp, Clock, CheckCircle2, Target, Calendar, Flame, Timer } from 'lucide-react';
+import { StudyTask, UserStats, FocusSession } from '@/types/study';
+import { format, subDays, startOfDay, eachDayOfInterval, isSameDay } from 'date-fns';
+import { Badge } from '@/components/ui/badge';
+import { ScrollArea } from '@/components/ui/scroll-area';
 
 interface StudyAnalyticsProps {
   tasks: StudyTask[];
   stats: UserStats;
+  focusSessions: FocusSession[];
 }
 
 const chartConfig = {
@@ -26,8 +29,8 @@ const chartConfig = {
   },
 };
 
-export function StudyAnalytics({ tasks, stats }: StudyAnalyticsProps) {
-  // Generate last 7 days productivity data
+export function StudyAnalytics({ tasks, stats, focusSessions }: StudyAnalyticsProps) {
+  // Generate last 7 days productivity data using actual focus sessions
   const weeklyData = useMemo(() => {
     const today = startOfDay(new Date());
     const days = eachDayOfInterval({
@@ -35,25 +38,52 @@ export function StudyAnalytics({ tasks, stats }: StudyAnalyticsProps) {
       end: today,
     });
 
-    return days.map((day, index) => {
+    return days.map((day) => {
       const dayTasks = tasks.filter(task => 
         task.completedAt && 
         startOfDay(task.completedAt).getTime() === day.getTime()
       );
       
-      // Simulate focus time based on completed tasks (in real app, track actual sessions)
-      const focusMinutes = dayTasks.reduce((sum, t) => sum + t.estimatedMinutes, 0) + 
-        Math.floor(Math.random() * 30) + (index * 10);
+      // Calculate actual focus minutes from sessions
+      const daySessions = focusSessions.filter(session => 
+        isSameDay(session.startTime, day)
+      );
+      const focusMinutes = daySessions.reduce((sum, s) => sum + s.durationMinutes, 0);
+      const sessionCount = daySessions.length;
+      
+      // Calculate productivity based on completed tasks and focus time
+      const productivity = Math.min(
+        Math.floor(((dayTasks.length * 20) + (focusMinutes / 3)) / 2),
+        100
+      );
       
       return {
         day: format(day, 'EEE'),
         date: format(day, 'MMM d'),
-        completed: dayTasks.length + Math.floor(Math.random() * 3),
-        focusMinutes: Math.min(focusMinutes, 180),
-        productivity: Math.min(Math.floor(((dayTasks.length + 1) / 5) * 100 + Math.random() * 20), 100),
+        completed: dayTasks.length,
+        focusMinutes,
+        sessionCount,
+        productivity: Math.max(productivity, 5),
       };
     });
-  }, [tasks]);
+  }, [tasks, focusSessions]);
+
+  // Recent sessions for the history list
+  const recentSessions = useMemo(() => {
+    return [...focusSessions]
+      .sort((a, b) => b.startTime.getTime() - a.startTime.getTime())
+      .slice(0, 10);
+  }, [focusSessions]);
+
+  // Total sessions stats
+  const sessionStats = useMemo(() => {
+    const totalSessions = focusSessions.length;
+    const completedSessions = focusSessions.filter(s => s.completed).length;
+    const totalMinutes = focusSessions.reduce((sum, s) => sum + s.durationMinutes, 0);
+    const avgDuration = totalSessions > 0 ? Math.round(totalMinutes / totalSessions) : 0;
+    
+    return { totalSessions, completedSessions, totalMinutes, avgDuration };
+  }, [focusSessions]);
 
   // Task distribution by subject
   const subjectData = useMemo(() => {
@@ -310,6 +340,65 @@ export function StudyAnalytics({ tasks, stats }: StudyAnalyticsProps) {
           </CardContent>
         </Card>
       </div>
+
+      {/* Pomodoro Session History */}
+      <Card className="shadow-card">
+        <CardHeader className="pb-2">
+          <div className="flex items-center justify-between">
+            <CardTitle className="text-base font-semibold flex items-center gap-2">
+              <Timer className="h-4 w-4 text-primary" />
+              Pomodoro Session History
+            </CardTitle>
+            <div className="flex items-center gap-4 text-xs text-muted-foreground">
+              <span>{sessionStats.totalSessions} sessions</span>
+              <span>{sessionStats.avgDuration} min avg</span>
+              <span>{Math.floor(sessionStats.totalMinutes / 60)}h {sessionStats.totalMinutes % 60}m total</span>
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <ScrollArea className="h-[200px]">
+            <div className="space-y-2">
+              {recentSessions.length === 0 ? (
+                <div className="text-center py-8 text-muted-foreground text-sm">
+                  No focus sessions yet. Start the timer to track your study time!
+                </div>
+              ) : (
+                recentSessions.map((session) => (
+                  <div 
+                    key={session.id}
+                    className="flex items-center justify-between p-3 rounded-lg bg-muted/50 hover:bg-muted transition-colors"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className={`h-8 w-8 rounded-lg flex items-center justify-center ${
+                        session.completed ? 'bg-success/20' : 'bg-warning/20'
+                      }`}>
+                        <Timer className={`h-4 w-4 ${
+                          session.completed ? 'text-success' : 'text-warning'
+                        }`} />
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium text-foreground">
+                          {session.durationMinutes} minute session
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          {format(session.startTime, 'MMM d, yyyy')} at {format(session.startTime, 'h:mm a')}
+                        </p>
+                      </div>
+                    </div>
+                    <Badge 
+                      variant={session.completed ? 'default' : 'secondary'}
+                      className={session.completed ? 'bg-success/20 text-success hover:bg-success/30' : ''}
+                    >
+                      {session.completed ? 'Completed' : 'Partial'}
+                    </Badge>
+                  </div>
+                ))
+              )}
+            </div>
+          </ScrollArea>
+        </CardContent>
+      </Card>
     </div>
   );
 }

@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
 interface FocusTimerProps {
-  onSessionComplete: (minutes: number) => void;
+  onSessionComplete: (minutes: number, completed?: boolean) => void;
 }
 
 export function FocusTimer({ onSessionComplete }: FocusTimerProps) {
@@ -25,7 +25,7 @@ export function FocusTimer({ onSessionComplete }: FocusTimerProps) {
 
   const handleReset = useCallback(() => {
     if (sessionMinutes > 0) {
-      onSessionComplete(sessionMinutes);
+      onSessionComplete(sessionMinutes, false); // Partial session
     }
     setIsRunning(false);
     setTimeLeft(focusDuration);
@@ -43,7 +43,7 @@ export function FocusTimer({ onSessionComplete }: FocusTimerProps) {
         }
       }, 1000);
     } else if (timeLeft === 0) {
-      onSessionComplete(Math.floor(focusDuration / 60));
+      onSessionComplete(Math.floor(focusDuration / 60), true); // Completed session
       setIsRunning(false);
       setTimeLeft(focusDuration);
       setSessionMinutes(0);

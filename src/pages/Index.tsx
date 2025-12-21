@@ -25,7 +25,8 @@ const Index = () => {
   const { 
     tasks, 
     exams,
-    stats, 
+    stats,
+    focusSessions,
     prioritizedTasks, 
     upcomingExams, 
     addTask,
@@ -34,7 +35,7 @@ const Index = () => {
     completeTask, 
     deleteTask, 
     deleteExam,
-    addFocusTime 
+    addFocusSession 
   } = useStudyPlan();
 
   return (
@@ -80,12 +81,12 @@ const Index = () => {
                   <AIRecommendations tasks={tasks} exams={upcomingExams} />
 
                   {/* Study Analytics - Full Width */}
-                  <StudyAnalytics tasks={tasks} stats={stats} />
+                  <StudyAnalytics tasks={tasks} stats={stats} focusSessions={focusSessions} />
                 </div>
 
                 {/* Right Column - Calendar and Timer */}
                 <div className="space-y-6">
-                  <FocusTimer onSessionComplete={addFocusTime} />
+                  <FocusTimer onSessionComplete={addFocusSession} />
                   <WeeklyCalendar tasks={tasks} />
                 </div>
               </div>
