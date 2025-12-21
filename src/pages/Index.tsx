@@ -8,6 +8,7 @@ import { WeeklyCalendar } from '@/components/WeeklyCalendar';
 import { TasksList } from '@/components/TasksList';
 import { ExamsList } from '@/components/ExamsList';
 import { AIRecommendations } from '@/components/AIRecommendations';
+import { StudyAnalytics } from '@/components/StudyAnalytics';
 import { AddNewDialog } from '@/components/AddNewDialog';
 import { AddTaskDialog } from '@/components/AddTaskDialog';
 import { AddExamDialog } from '@/components/AddExamDialog';
@@ -67,6 +68,9 @@ const Index = () => {
 
                 {/* AI Recommendations - Full Width */}
                 <AIRecommendations tasks={tasks} exams={upcomingExams} />
+
+                {/* Study Analytics - Full Width */}
+                <StudyAnalytics tasks={tasks} stats={stats} />
               </div>
 
               {/* Right Column - Calendar and Timer */}
