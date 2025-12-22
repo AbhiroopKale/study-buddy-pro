@@ -6,10 +6,12 @@ import {
   Plus, 
   HelpCircle, 
   LogOut,
-  BookOpen
+  BookOpen,
+  BarChart3
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 interface SidebarProps {
   activeTab: string;
@@ -22,9 +24,31 @@ const navItems = [
   { id: 'calendar', label: 'Calendar', icon: Calendar },
   { id: 'tasks', label: 'Tasks', icon: ListTodo },
   { id: 'focus', label: 'Focus Timer', icon: Timer },
+  { id: 'stats', label: 'Your Stats', icon: BarChart3, isRoute: true, path: '/stats' },
 ];
 
 export function Sidebar({ activeTab, onTabChange, onAddNew }: SidebarProps) {
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const handleNavClick = (item: typeof navItems[0]) => {
+    if (item.isRoute && item.path) {
+      navigate(item.path);
+    } else {
+      if (location.pathname !== '/') {
+        navigate('/');
+      }
+      onTabChange(item.id);
+    }
+  };
+
+  const isItemActive = (item: typeof navItems[0]) => {
+    if (item.isRoute && item.path) {
+      return location.pathname === item.path;
+    }
+    return activeTab === item.id && location.pathname === '/';
+  };
+
   return (
     <aside className="fixed left-0 top-0 z-40 h-screen w-64 border-r border-sidebar-border bg-sidebar flex flex-col">
       {/* Logo */}
@@ -40,11 +64,11 @@ export function Sidebar({ activeTab, onTabChange, onAddNew }: SidebarProps) {
         <ul className="space-y-1">
           {navItems.map((item) => {
             const Icon = item.icon;
-            const isActive = activeTab === item.id;
+            const isActive = isItemActive(item);
             return (
               <li key={item.id}>
                 <button
-                  onClick={() => onTabChange(item.id)}
+                  onClick={() => handleNavClick(item)}
                   className={cn(
                     "flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200",
                     isActive 

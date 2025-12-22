@@ -9,7 +9,6 @@ import { MonthlyCalendar } from '@/components/MonthlyCalendar';
 import { TasksList } from '@/components/TasksList';
 import { ExamsList } from '@/components/ExamsList';
 import { AIRecommendations } from '@/components/AIRecommendations';
-import { StudyAnalytics } from '@/components/StudyAnalytics';
 import { AddNewDialog } from '@/components/AddNewDialog';
 import { AddTaskDialog } from '@/components/AddTaskDialog';
 import { AddExamDialog } from '@/components/AddExamDialog';
@@ -26,7 +25,6 @@ const Index = () => {
     tasks, 
     exams,
     stats,
-    focusSessions,
     prioritizedTasks, 
     upcomingExams, 
     addTask,
@@ -79,9 +77,6 @@ const Index = () => {
 
                   {/* AI Recommendations - Full Width */}
                   <AIRecommendations tasks={tasks} exams={upcomingExams} />
-
-                  {/* Study Analytics - Full Width */}
-                  <StudyAnalytics tasks={tasks} stats={stats} focusSessions={focusSessions} />
                 </div>
 
                 {/* Right Column - Calendar and Timer */}
