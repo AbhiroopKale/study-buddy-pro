@@ -2,11 +2,20 @@ import { useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
 import { AreaChart, Area, BarChart, Bar, XAxis, YAxis, PieChart, Pie, Cell } from 'recharts';
-import { TrendingUp, Clock, CheckCircle2, Target, Calendar, Flame, Timer } from 'lucide-react';
+import { TrendingUp, Clock, CheckCircle2, Target, Calendar, Flame, Timer, Download, FileText, FileSpreadsheet } from 'lucide-react';
 import { StudyTask, UserStats, FocusSession } from '@/types/study';
 import { format, subDays, startOfDay, eachDayOfInterval, isSameDay } from 'date-fns';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { Button } from '@/components/ui/button';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { exportToCSV, exportToPDF } from '@/utils/exportStats';
+import { toast } from '@/hooks/use-toast';
 
 interface StudyAnalyticsProps {
   tasks: StudyTask[];
@@ -126,8 +135,46 @@ export function StudyAnalytics({ tasks, stats, focusSessions }: StudyAnalyticsPr
   const avgProductivity = Math.floor(weeklyData.reduce((sum, d) => sum + d.productivity, 0) / 7);
   const totalCompleted = weeklyData.reduce((sum, d) => sum + d.completed, 0);
 
+  const handleExportCSV = () => {
+    exportToCSV({ tasks, focusSessions, stats });
+    toast({
+      title: 'Export successful',
+      description: 'Your stats have been exported as CSV.',
+    });
+  };
+
+  const handleExportPDF = () => {
+    exportToPDF({ tasks, focusSessions, stats });
+    toast({
+      title: 'Export successful',
+      description: 'Your stats have been exported as PDF.',
+    });
+  };
+
   return (
     <div className="space-y-6 animate-fade-in">
+      {/* Export Button */}
+      <div className="flex justify-end">
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="outline" className="gap-2">
+              <Download className="h-4 w-4" />
+              Export Stats
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuItem onClick={handleExportPDF} className="gap-2 cursor-pointer">
+              <FileText className="h-4 w-4" />
+              Export as PDF
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={handleExportCSV} className="gap-2 cursor-pointer">
+              <FileSpreadsheet className="h-4 w-4" />
+              Export as CSV
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
+
       {/* Summary Stats Row */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <Card className="shadow-card hover:shadow-card-hover transition-shadow">
