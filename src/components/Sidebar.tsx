@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { 
   LayoutDashboard, 
   Calendar, 
@@ -12,6 +13,8 @@ import {
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { useAuth } from '@/hooks/useAuth';
+import { toast } from 'sonner';
 
 interface SidebarProps {
   activeTab: string;
@@ -30,6 +33,20 @@ const navItems = [
 export function Sidebar({ activeTab, onTabChange, onAddNew }: SidebarProps) {
   const navigate = useNavigate();
   const location = useLocation();
+  const { signOut } = useAuth();
+  const [isSigningOut, setIsSigningOut] = useState(false);
+
+  const handleSignOut = async () => {
+    setIsSigningOut(true);
+    const { error } = await signOut();
+    if (error) {
+      toast.error('Error signing out');
+      setIsSigningOut(false);
+    } else {
+      toast.success('Signed out successfully');
+      navigate('/auth');
+    }
+  };
 
   const handleNavClick = (item: typeof navItems[0]) => {
     if (item.isRoute && item.path) {
@@ -105,9 +122,13 @@ export function Sidebar({ activeTab, onTabChange, onAddNew }: SidebarProps) {
             </button>
           </li>
           <li>
-            <button className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground transition-colors">
+            <button 
+              onClick={handleSignOut}
+              disabled={isSigningOut}
+              className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground transition-colors disabled:opacity-50"
+            >
               <LogOut className="h-5 w-5" />
-              Log Out
+              {isSigningOut ? 'Signing out...' : 'Log Out'}
             </button>
           </li>
         </ul>
