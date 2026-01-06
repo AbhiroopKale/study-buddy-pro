@@ -8,7 +8,8 @@ import {
   HelpCircle, 
   LogOut,
   BookOpen,
-  BarChart3
+  BarChart3,
+  Settings
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -115,6 +116,15 @@ export function Sidebar({ activeTab, onTabChange, onAddNew }: SidebarProps) {
       {/* Bottom Actions */}
       <div className="border-t border-sidebar-border p-3">
         <ul className="space-y-1">
+          <li>
+            <button 
+              onClick={() => navigate('/settings')}
+              className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground transition-colors"
+            >
+              <Settings className="h-5 w-5" />
+              Settings
+            </button>
+          </li>
           <li>
             <button className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground transition-colors">
               <HelpCircle className="h-5 w-5" />
