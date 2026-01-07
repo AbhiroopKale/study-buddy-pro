@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Camera, Loader2, AlertTriangle } from 'lucide-react';
+import { useTheme } from 'next-themes';
+import { ArrowLeft, Camera, Loader2, AlertTriangle, Sun, Moon, Monitor } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -18,6 +19,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
+import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
@@ -25,6 +27,7 @@ import { toast } from 'sonner';
 export default function Settings() {
   const navigate = useNavigate();
   const { user, signOut } = useAuth();
+  const { theme, setTheme } = useTheme();
   const fileInputRef = useRef<HTMLInputElement>(null);
   
   const [displayName, setDisplayName] = useState('');
@@ -238,6 +241,40 @@ export default function Settings() {
           <ArrowLeft className="h-4 w-4 mr-2" />
           Back to Dashboard
         </Button>
+
+        {/* Appearance Card */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Appearance</CardTitle>
+            <CardDescription>
+              Customize how the app looks
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-2">
+              <Label>Theme</Label>
+              <ToggleGroup
+                type="single"
+                value={theme}
+                onValueChange={(value) => value && setTheme(value)}
+                className="justify-start"
+              >
+                <ToggleGroupItem value="light" aria-label="Light mode" className="gap-2">
+                  <Sun className="h-4 w-4" />
+                  Light
+                </ToggleGroupItem>
+                <ToggleGroupItem value="dark" aria-label="Dark mode" className="gap-2">
+                  <Moon className="h-4 w-4" />
+                  Dark
+                </ToggleGroupItem>
+                <ToggleGroupItem value="system" aria-label="System theme" className="gap-2">
+                  <Monitor className="h-4 w-4" />
+                  System
+                </ToggleGroupItem>
+              </ToggleGroup>
+            </div>
+          </CardContent>
+        </Card>
 
         {/* Profile Settings Card */}
         <Card>
