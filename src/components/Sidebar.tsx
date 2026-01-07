@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTheme } from 'next-themes';
 import { 
   LayoutDashboard, 
   Calendar, 
@@ -9,7 +10,9 @@ import {
   LogOut,
   BookOpen,
   BarChart3,
-  Settings
+  Settings,
+  Sun,
+  Moon
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -35,7 +38,12 @@ export function Sidebar({ activeTab, onTabChange, onAddNew }: SidebarProps) {
   const navigate = useNavigate();
   const location = useLocation();
   const { signOut } = useAuth();
+  const { theme, setTheme } = useTheme();
   const [isSigningOut, setIsSigningOut] = useState(false);
+
+  const toggleTheme = () => {
+    setTheme(theme === 'dark' ? 'light' : 'dark');
+  };
 
   const handleSignOut = async () => {
     setIsSigningOut(true);
@@ -70,11 +78,20 @@ export function Sidebar({ activeTab, onTabChange, onAddNew }: SidebarProps) {
   return (
     <aside className="fixed left-0 top-0 z-40 h-screen w-64 border-r border-sidebar-border bg-sidebar flex flex-col">
       {/* Logo */}
-      <div className="flex items-center gap-2 px-6 py-5">
-        <div className="flex h-9 w-9 items-center justify-center rounded-lg gradient-hero">
-          <BookOpen className="h-5 w-5 text-primary-foreground" />
+      <div className="flex items-center justify-between px-6 py-5">
+        <div className="flex items-center gap-2">
+          <div className="flex h-9 w-9 items-center justify-center rounded-lg gradient-hero">
+            <BookOpen className="h-5 w-5 text-primary-foreground" />
+          </div>
+          <span className="text-xl font-bold text-primary">StudyPlan</span>
         </div>
-        <span className="text-xl font-bold text-primary">StudyPlan</span>
+        <button
+          onClick={toggleTheme}
+          className="p-2 rounded-lg text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground transition-colors"
+          aria-label="Toggle theme"
+        >
+          {theme === 'dark' ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+        </button>
       </div>
 
       {/* Navigation */}
