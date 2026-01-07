@@ -1,53 +1,62 @@
 import { useState } from 'react';
 import { useTheme } from 'next-themes';
-import { 
-  LayoutDashboard, 
-  Calendar, 
-  ListTodo, 
-  Timer, 
-  Plus, 
-  HelpCircle, 
-  LogOut,
-  BookOpen,
-  BarChart3,
-  Settings,
-  Sun,
-  Moon
-} from 'lucide-react';
+import { LayoutDashboard, Calendar, ListTodo, Timer, Plus, HelpCircle, LogOut, BookOpen, BarChart3, Settings, Sun, Moon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
-
 interface SidebarProps {
   activeTab: string;
   onTabChange: (tab: string) => void;
   onAddNew: () => void;
 }
-
-const navItems = [
-  { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
-  { id: 'calendar', label: 'Calendar', icon: Calendar },
-  { id: 'tasks', label: 'Tasks', icon: ListTodo },
-  { id: 'focus', label: 'Focus Timer', icon: Timer },
-  { id: 'stats', label: 'Your Stats', icon: BarChart3, isRoute: true, path: '/stats' },
-];
-
-export function Sidebar({ activeTab, onTabChange, onAddNew }: SidebarProps) {
+const navItems = [{
+  id: 'dashboard',
+  label: 'Dashboard',
+  icon: LayoutDashboard
+}, {
+  id: 'calendar',
+  label: 'Calendar',
+  icon: Calendar
+}, {
+  id: 'tasks',
+  label: 'Tasks',
+  icon: ListTodo
+}, {
+  id: 'focus',
+  label: 'Focus Timer',
+  icon: Timer
+}, {
+  id: 'stats',
+  label: 'Your Stats',
+  icon: BarChart3,
+  isRoute: true,
+  path: '/stats'
+}];
+export function Sidebar({
+  activeTab,
+  onTabChange,
+  onAddNew
+}: SidebarProps) {
   const navigate = useNavigate();
   const location = useLocation();
-  const { signOut } = useAuth();
-  const { theme, setTheme } = useTheme();
+  const {
+    signOut
+  } = useAuth();
+  const {
+    theme,
+    setTheme
+  } = useTheme();
   const [isSigningOut, setIsSigningOut] = useState(false);
-
   const toggleTheme = () => {
     setTheme(theme === 'dark' ? 'light' : 'dark');
   };
-
   const handleSignOut = async () => {
     setIsSigningOut(true);
-    const { error } = await signOut();
+    const {
+      error
+    } = await signOut();
     if (error) {
       toast.error('Error signing out');
       setIsSigningOut(false);
@@ -56,7 +65,6 @@ export function Sidebar({ activeTab, onTabChange, onAddNew }: SidebarProps) {
       navigate('/auth');
     }
   };
-
   const handleNavClick = (item: typeof navItems[0]) => {
     if (item.isRoute && item.path) {
       navigate(item.path);
@@ -67,16 +75,13 @@ export function Sidebar({ activeTab, onTabChange, onAddNew }: SidebarProps) {
       onTabChange(item.id);
     }
   };
-
   const isItemActive = (item: typeof navItems[0]) => {
     if (item.isRoute && item.path) {
       return location.pathname === item.path;
     }
     return activeTab === item.id && location.pathname === '/';
   };
-
-  return (
-    <aside className="fixed left-0 top-0 z-40 h-screen w-64 border-r border-sidebar-border bg-sidebar flex flex-col">
+  return <aside className="fixed left-0 top-0 z-40 h-screen w-64 border-r border-sidebar-border bg-sidebar flex flex-col">
       {/* Logo */}
       <div className="flex items-center justify-between px-6 py-5">
         <div className="flex items-center gap-2">
@@ -85,45 +90,28 @@ export function Sidebar({ activeTab, onTabChange, onAddNew }: SidebarProps) {
           </div>
           <span className="text-xl font-bold text-primary">StudyPlan</span>
         </div>
-        <button
-          onClick={toggleTheme}
-          className="p-2 rounded-lg text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground transition-colors"
-          aria-label="Toggle theme"
-        >
+        <button onClick={toggleTheme} className="p-2 rounded-lg text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground transition-colors" aria-label="Toggle theme">
           {theme === 'dark' ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
         </button>
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 px-3 py-4">
+      <nav className="flex-1 px-3 py-4 bg-primary-foreground">
         <ul className="space-y-1">
-          {navItems.map((item) => {
-            const Icon = item.icon;
-            const isActive = isItemActive(item);
-            return (
-              <li key={item.id}>
-                <button
-                  onClick={() => handleNavClick(item)}
-                  className={cn(
-                    "flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200",
-                    isActive 
-                      ? "gradient-hero text-primary-foreground shadow-md" 
-                      : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
-                  )}
-                >
+          {navItems.map(item => {
+          const Icon = item.icon;
+          const isActive = isItemActive(item);
+          return <li key={item.id}>
+                <button onClick={() => handleNavClick(item)} className={cn("flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200", isActive ? "gradient-hero text-primary-foreground shadow-md" : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground")}>
                   <Icon className="h-5 w-5" />
                   {item.label}
                 </button>
-              </li>
-            );
-          })}
+              </li>;
+        })}
         </ul>
 
-        <div className="mt-6 space-y-2">
-          <Button
-            onClick={onAddNew}
-            className="w-full gradient-hero text-primary-foreground font-semibold shadow-md hover:shadow-lg transition-shadow"
-          >
+        <div className="mt-6 space-y-2 bg-primary-foreground shadow">
+          <Button onClick={onAddNew} className="w-full gradient-hero text-primary-foreground font-semibold shadow-md hover:shadow-lg transition-shadow">
             <Plus className="mr-2 h-4 w-4" />
             Add New
           </Button>
@@ -134,32 +122,21 @@ export function Sidebar({ activeTab, onTabChange, onAddNew }: SidebarProps) {
       <div className="border-t border-sidebar-border p-3">
         <ul className="space-y-1">
           <li>
-            <button 
-              onClick={() => navigate('/settings')}
-              className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground transition-colors"
-            >
+            <button onClick={() => navigate('/settings')} className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground transition-colors">
               <Settings className="h-5 w-5" />
               Settings
             </button>
           </li>
           <li>
-            <button className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground transition-colors">
-              <HelpCircle className="h-5 w-5" />
-              Help Center
-            </button>
+            
           </li>
           <li>
-            <button 
-              onClick={handleSignOut}
-              disabled={isSigningOut}
-              className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground transition-colors disabled:opacity-50"
-            >
+            <button onClick={handleSignOut} disabled={isSigningOut} className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground transition-colors disabled:opacity-50">
               <LogOut className="h-5 w-5" />
               {isSigningOut ? 'Signing out...' : 'Log Out'}
             </button>
           </li>
         </ul>
       </div>
-    </aside>
-  );
+    </aside>;
 }
